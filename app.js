@@ -60,7 +60,8 @@ app.get('/cipher', (req, res) => {
 }); 
 
 app.get('/lotto', (req, res) => {
-    const numbers = req.query.numbers; 
+    const numbers = req.query.numbers.map(num => parseInt(num)); 
+    
     if (numbers.length !== 6) {
         return res.status(400).send('Numbers must be an array of 6 numbers');
     }
@@ -75,18 +76,8 @@ app.get('/lotto', (req, res) => {
         randArr.push(Math.floor((Math.random() * 20) + 1)); 
     }
     
-    let match = 0; 
-    for (let i of randArr) {
-        // if (numbers.indexOf(randArr[i]) > -1){
-        //     match += 1;
-        // }
-    }
-    // const match = randArr.filter(num => matchingFilter(num)); 
-
-    // function matchingFilter(num) {
-    //     numbers.includes(num) ? 1 : 0
-    // }
-
+    const match = randArr.filter(numbers.includes).length; 
+    
     switch (match) {
         case 6: 
             responseText = 'Wow! Unbelievable! You could have won the mega millions!';
@@ -101,9 +92,88 @@ app.get('/lotto', (req, res) => {
             responseText = 'Sorry, you lose'; 
     }
 
-    res.send(`randArr: ${randArr} and match:${match}`); 
+    res.send(responseText); 
 }); 
  
+app.get('/hello', (req, res) => {
+    res.status(204).end(); 
+}); 
+
+app.get('/video', (req, res) => {
+    const video = {
+        title: 'Cats falling over', 
+        description: '15 minutes of fun', 
+        length: '15.40'
+    }
+    res.json(video); 
+}); 
+
+app.get('/colors', (req, res) => {
+    const colors = [
+      {
+        name: "red",
+        rgb: "FF0000"
+      },
+      {
+        name: "green",
+        rgb: "00FF00"
+      }, 
+      {
+        name: "blue",
+        rgb: "0000FF"
+      },
+    ];
+    res.json(colors);
+});
+
+
+app.get('/grade', (req, res) => {
+    // get the mark from the query
+    const { mark } = req.query;
+  
+    // do some validation
+    if(!mark) {
+      // mark is required
+      return res
+        .status(400)
+        .send("Please provide a mark");
+    }
+  
+    const numericMark = parseFloat(mark);
+    if(Number.isNaN(numericMark)) {
+      // mark must be a number
+      return res
+        .status(400)
+        .send("Mark must be a numeric value");
+    }
+  
+    if(numericMark < 0 || numericMark > 100) {
+      // mark must be in range 0 to 100
+      return res
+        .status(400)
+        .send("Mark must be in range 0 to 100");
+    }
+  
+    if(numericMark >= 90) {
+      return res
+        .send("A");
+    } 
+  
+    if(numericMark >= 80) {
+      return res
+        .send("B");
+    }
+  
+    if(numericMark >= 70) {
+      return res
+        .send("C");
+    }
+  
+    res
+      .send("F");
+});
+
+
 app.get('/queryViewer', (req, res) => {
     console.log(req.query);
     res.end(); //do not send any data back to the client
